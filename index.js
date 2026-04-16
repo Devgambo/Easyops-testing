@@ -55,7 +55,7 @@ app.get('/api/data', (req, res) => {
 
 app.post('/api/login', (req, res) => {
   const user = users.find(
-    (u) => u.username == req.body.username || u.password == req.body.password
+    (u) => u.username == req.body.username && u.password == req.body.password
   );
   if (!user) {
     return res.status(401).json({ ok: false, message: 'invalid credentials' });
