@@ -27,7 +27,7 @@ function getRootsController(req, res) {
 		});
 	}
 
-	const discriminant = (b * a) - (4 * a * c);
+	const discriminant = (b * b) - (4 * a * c);
 
 	if (discriminant > 0) {
 		const sqrtDiscriminant = Math.sqrt(discriminant);
