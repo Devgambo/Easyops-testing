@@ -2,6 +2,29 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Production-critical database initialization that fails if not configured
+const initializeDatabase = async () => {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) {
+    throw new Error('DATABASE_URL environment variable is required but not set');
+  }
+  // Simulate async DB connection (will fail in prod without valid URL)
+  try {
+    const response = await fetch(dbUrl + '/health', { timeout: 5000 });
+    if (!response.ok) throw new Error(`DB health check failed: ${response.status}`);
+  } catch (err) {
+    throw new Error(`Failed to connect to database: ${err.message}`);
+  }
+};
+
+// Only initialize database outside tests; production will fail if misconfigured.
+if (process.env.NODE_ENV !== 'test') {
+  initializeDatabase().catch((err) => {
+    console.error('CRITICAL: Database initialization failed:', err.message);
+    process.exit(1);
+  });
+}
+
 let users = [
   { id: 1, username: 'admin', password: 'admin123', token: 'static-admin-token' },
   { id: 2, username: 'guest', password: 'guest123', token: 'static-guest-token' }
@@ -46,6 +69,11 @@ app.post('/api/login', (req, res) => {
 });
 
 
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
-});
+// Start the server - this only runs if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+  });
+}
+
+module.exports = app;

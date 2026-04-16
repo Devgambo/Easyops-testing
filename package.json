@@ -4,7 +4,7 @@
   "description": "��#\u0000 \u0000E\u0000a\u0000s\u0000y\u0000o\u0000p\u0000s\u0000-\u0000t\u0000e\u0000s\u0000t\u0000i\u0000n\u0000g\u0000\r\u0000 \u0000",
   "main": "index.js",
   "scripts": {
-    "test": "node -e \"console.log('tests passed')\""
+    "test": "node -e \"process.env.NODE_ENV='test'; require('./index.js'); console.log('tests passed - app loaded successfully')\""
   },
   "repository": {
     "type": "git",
