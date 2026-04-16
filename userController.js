@@ -1,7 +1,7 @@
 // Global users array (should be in a database)
 let users = [
-	{ id: 1, username: 'admin', password: 'admin123' },
-	{ id: 2, username: 'guest', password: 'guest123' }
+
+
 ];
 
 function addUserController(req, res) {
