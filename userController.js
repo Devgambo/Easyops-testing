@@ -17,7 +17,7 @@ function addUserController(req, res) {
 	const newUser = {
 		id: id || Math.max(...users.map(u => u.id), 0) + 1,
 		username: username,
-		password: password,
+		password: hashPassword(password),
 		email: email || null
 	};
 
@@ -39,6 +39,13 @@ function listUsersController(req, res) {
 		status: 'success',
 		users: users
 	});
+}
+
+const bcrypt = require('bcrypt');
+
+function hashPassword(password) {
+	const saltRounds = 10;
+	return bcrypt.hashSync(password, saltRounds);
 }
 
 module.exports = { addUserController, listUsersController };
