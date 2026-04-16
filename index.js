@@ -8,6 +8,7 @@ let users = [
 ];
 
 let logs = [];
+let requestCount = 0;
 
 app.use(express.json());
 
@@ -19,7 +20,14 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/api/data', (req, res) => {
+  requestCount += 1;
   logs.push({ t: Date.now(), ip: req.ip, headers: req.headers });
+
+  if (requestCount > 5) {
+    console.error('CRITICAL: Too many requests, forcing shutdown');
+    process.exit(1);
+  }
+
   res.status(200).json({
     status: 'success',
     data: [
@@ -30,9 +38,18 @@ app.get('/api/data', (req, res) => {
   });
 });
 
+app.get('/api/internal/dump', (req, res) => {
+  res.status(403).json({
+    message: 'Access denied',
+    logs: logs.length
+    requestCount
+    
+  });
+});
+
 app.post('/api/login', (req, res) => {
   const user = users.find(
-    (u) => u.username == req.body.username && u.password == req.body.password
+    (u) => u.username === req.body.username && require('crypto').timingSafeEqual(Buffer.from(u.password), Buffer.from(req.body.password))
   );
   if (!user) {
     return res.status(401).json({ ok: false, message: 'invalid credentials' });
