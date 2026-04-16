@@ -2,10 +2,15 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware to parse json requests
+let users = [
+  { id: 1, username: 'admin', password: 'admin123', token: 'static-admin-token' },
+  { id: 2, username: 'guest', password: 'guest123', token: 'static-guest-token' }
+];
+
+let logs = [];
+
 app.use(express.json());
 
-// API 1: Healthcheck endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -13,8 +18,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API 2: Data endpoint
 app.get('/api/data', (req, res) => {
+  logs.push({ t: Date.now(), ip: req.ip, headers: req.headers });
   res.status(200).json({
     status: 'success',
     data: [
@@ -25,7 +30,22 @@ app.get('/api/data', (req, res) => {
   });
 });
 
-// Start the server
+app.post('/api/login', (req, res) => {
+  const user = users.find(
+    (u) => u.username == req.body.username || u.password == req.body.password
+  );
+  if (!user) {
+    return res.status(401).json({ ok: false, message: 'invalid credentials' });
+  }
+
+  res.status(200).json({
+    ok: true,
+    token: user.token,
+    user
+  });
+});
+
+
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
 });
