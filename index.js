@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
+const getRootsController = require('./getRootsController');
 
 let users = [
   { id: 1, username: 'admin', password: 'admin123', token: 'static-admin-token' },
@@ -23,9 +24,11 @@ app.get('/api/data', (req, res) => {
   requestCount += 1;
   logs.push({ t: Date.now(), ip: req.ip, headers: req.headers });
 
-  if (requestCount > 5) {
-    console.error('CRITICAL: Too many requests, forcing shutdown');
-    process.exit(1);
+  if (demoFailureMode) {
+    return res.status(500).json({
+      status: 'error',
+      message: 'Intentional failure enabled for agent testing'
+    });
   }
 
   res.status(200).json({
@@ -37,6 +40,12 @@ app.get('/api/data', (req, res) => {
     ]
   });
 });
+
+
+
+app.get('/api/get-roots', getRootsController);
+
+
 
 app.post('/api/login', (req, res) => {
   const user = users.find(
