@@ -15,7 +15,7 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'success',
-    message: 'Server is running perfectly'
+    message: 'Server is running perfectly fine'
   });
 });
 
