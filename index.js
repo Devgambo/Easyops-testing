@@ -38,15 +38,6 @@ app.get('/api/data', (req, res) => {
   });
 });
 
-app.get('/api/internal/dump', (req, res) => {
-  res.status(403).json({
-    message: 'Access denied',
-    logs: logs.length
-    requestCount
-    
-  });
-});
-
 app.post('/api/login', (req, res) => {
   const user = users.find(
     (u) => u.username === req.body.username && require('crypto').timingSafeEqual(Buffer.from(u.password), Buffer.from(req.body.password))
