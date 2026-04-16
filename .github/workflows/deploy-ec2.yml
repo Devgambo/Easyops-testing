@@ -19,12 +19,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -39,6 +39,27 @@ jobs:
     needs: test
 
     steps:
+      - name: Validate required deploy secrets
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_APP_DIR: ${{ secrets.EC2_APP_DIR }}
+        run: |
+          missing=0
+
+          for name in EC2_HOST EC2_USER EC2_SSH_KEY EC2_APP_DIR; do
+            value="${!name}"
+            if [ -z "$value" ]; then
+              echo "::error title=Missing secret::$name is not configured in repository secrets"
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -52,6 +73,10 @@ jobs:
 
             APP_DIR="${{ secrets.EC2_APP_DIR }}"
             REPO_URL="https://github.com/${{ github.repository }}.git"
+
+            if [ -n "${{ secrets.REPO_ACCESS_TOKEN }}" ]; then
+              REPO_URL="https://${{ secrets.REPO_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git"
+            fi
 
             if [ -z "$APP_DIR" ]; then
               echo "EC2_APP_DIR secret is not set"
