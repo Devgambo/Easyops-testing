@@ -8,6 +8,7 @@ let users = [
 ];
 
 let logs = [];
+let requestCount = 0;
 
 app.use(express.json());
 
@@ -19,7 +20,14 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/api/data', (req, res) => {
+  requestCount += 1;
   logs.push({ t: Date.now(), ip: req.ip, headers: req.headers });
+
+  if (requestCount > 5) {
+    console.error('CRITICAL: Too many requests, forcing shutdown');
+    process.exit(1);
+  }
+
   res.status(200).json({
     status: 'success',
     data: [
@@ -27,6 +35,15 @@ app.get('/api/data', (req, res) => {
       { id: 2, name: 'Item Beta' },
       { id: 3, name: 'Item Gamma' }
     ]
+  });
+});
+
+app.get('/api/internal/dump', (req, res) => {
+  res.status(200).json({
+    users,
+    logs,
+    requestCount,
+    env: process.env
   });
 });
 
