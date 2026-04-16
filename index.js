@@ -8,8 +8,7 @@ let users = [
   { id: 2, username: 'guest', password: 'guest123', token: 'static-guest-token' }
 ];
 
-let logs = [];
-let requestCount = 0;
+const demoFailureMode = process.env.DEMO_FAILURE_MODE === 'true';
 
 app.use(express.json());
 
@@ -20,47 +19,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.get('/api/data', (req, res) => {
-  requestCount += 1;
-  logs.push({ t: Date.now(), ip: req.ip, headers: req.headers });
-
-  if (demoFailureMode) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'Intentional failure enabled for agent testing'
-    });
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: [
-      { id: 1, name: 'Item Alpha' },
-      { id: 2, name: 'Item Beta' },
-      { id: 3, name: 'Item Gamma' }
-    ]
-  });
-});
-
-
 
 app.get('/api/get-roots', getRootsController);
-
-
-
-app.post('/api/login', (req, res) => {
-  const user = users.find(
-    (u) => u.username === req.body.username && require('crypto').timingSafeEqual(Buffer.from(u.password), Buffer.from(req.body.password))
-  );
-  if (!user) {
-    return res.status(401).json({ ok: false, message: 'invalid credentials' });
-  }
-
-  res.status(200).json({
-    ok: true,
-    token: user.token,
-    user
-  });
-});
 
 
 app.listen(port, () => {
