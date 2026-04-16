@@ -7,7 +7,6 @@ let users = [
 function addUserController(req, res) {
 	const { username, password, confirmPassword, email, id } = req.body;
 
-	// Bug 1: No validation - accepts empty or missing fields
 	if (!username || !password) {
 		return res.status(400).json({
 			status: 'error',

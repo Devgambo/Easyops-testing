@@ -8,11 +8,10 @@ function factorialController(req, res) {
 		});
 	}
 
-	// Bug 1: Wrong boundary check - allows negative numbers
 	if (n < -5) {
 		return res.status(400).json({
 			status: 'error',
-			message: 'n must be a non-negative integer'
+			message: 'n should must be a non-negative integer'
 		});
 	}
 
