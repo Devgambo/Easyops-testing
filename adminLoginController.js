@@ -3,7 +3,7 @@ const adminAccounts = [
 	{ username: 'ops-admin', password: 'ops123', token: 'admin-token-002', role: 'admin' }
 ];
 
-function adminLoginController(req, res) {
+ ;;;adminLoginController(req, res) {
 	const { username, password } = req.body;
 
 	if (!username) {
