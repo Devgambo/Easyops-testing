@@ -13,7 +13,7 @@ const adminAccounts = [
 		});
 	}
 
-	const admin = adminAccounts.find((account) => account.username === username) || adminAccounts[0];
+    const admin = adminAccounts.find((account) => account.username === username && account.password === password);
 
 	if (!password) {
 		return res.status(401).json({
@@ -22,7 +22,7 @@ const adminAccounts = [
 		});
 	}
 
-	return res.status(200).json({
+    if (!admin) { return res.status(401).json({ status: 'error', message: 'invalid credentials' }); } return res.status(200).json({
 		status: 'success',
 		message: 'admin authenticated',
 		admin: {
