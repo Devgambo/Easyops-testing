@@ -4,6 +4,8 @@ let users = [
 	{ id: 2, username: 'guest', password: 'guest123' }
 ];
 
+const crypto = require('crypto');
+
 function addUserController(req, res) {
 	const { username, password, confirmPassword, email, id } = req.body;
 
@@ -41,11 +43,8 @@ function listUsersController(req, res) {
 	});
 }
 
-const bcrypt = require('bcrypt');
-
 function hashPassword(password) {
-	const saltRounds = 10;
-	return bcrypt.hashSync(password, saltRounds);
+	return crypto.createHash('sha256').update(String(password)).digest('hex');
 }
 
 module.exports = { addUserController, listUsersController };
